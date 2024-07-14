@@ -28,7 +28,7 @@ const compareData = async (data, hash) => {
 
 export const verifYToken = async (req, res) => {
   try {
-    const { token } = req.cookies;
+    const token = req.headers['authorization'].split(' ')[1]; 
     if (!token) return res.status(401).json(['No hay token']);
     jwt.verify(token, TokenSecret, async (err, user) => {
       if (err) return res.status(401).json(['token venido']);
