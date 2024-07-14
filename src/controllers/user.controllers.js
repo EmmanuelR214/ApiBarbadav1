@@ -36,7 +36,7 @@ export const verifYToken = async (req, res) => {
         const [userFound] = await Coonexion.query('CALL obtenerUsuarioID(?)', [user.id]);
         if (!userFound || !userFound[0]) return res.status(401).json(['No en la base de datos']);
         const [dataUser] = userFound;
-        res.status(200).json([req.cookies, userFound, dataUser, dataUser[0].id_usuario])
+        // res.status(200).json([req.cookies, userFound, dataUser, dataUser[0].id_usuario])
         return res.json({
           id: dataUser[0].id_usuario,
           rol: dataUser[0].roles,
