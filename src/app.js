@@ -6,10 +6,9 @@ import indexRoutes from './routers/user.routes.js'
 const app = express()
 
 const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'https://amdin.labarbada.store ', 'https://labarbada.store/']
-// const allowedOrigins = ['amdin.labarbada.store ', 'labarbada.store']
 
 app.use(cors({
-    origin: allowedOrigins,
+    origin: "https://labarbada.store/",
     credentials: true
 }));
 app.use(express.json())
