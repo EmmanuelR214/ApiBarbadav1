@@ -51,6 +51,31 @@ export const verifYToken = async (req, res) => {
     return res.status(500).json(['Server Error']);
   }
 };
+// export const verifYToken = async (req, res) => {
+//   try {
+//     const token = req.headers['authorization'].split(' ')[1]; 
+//     if (!token) return res.status(401).json(['No hay token']);
+//     jwt.verify(token, TokenSecret, async (err, user) => {
+//       if (err) return res.status(401).json(['token venido']);
+//       try {
+//         const [userFound] = await Coonexion.query('CALL obtenerUsuarioID(?)', [user.id]);
+//         if (!userFound || !userFound[0]) return res.status(401).json(['No en la base de datos']);
+//         const [dataUser] = userFound;
+//         return res.json({
+//           id: dataUser[0].id_usuario,
+//           rol: dataUser[0].roles,
+//           email: dataUser[0].correo
+//         });
+//       } catch (dbError) {
+//         console.log(dbError);
+//         return res.status(500).json(['Database Error']);
+//       }
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json(['Server Error']);
+//   }
+// };
 
 
 //Actualiza contraseña por correo
