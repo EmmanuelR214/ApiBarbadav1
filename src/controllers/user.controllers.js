@@ -30,7 +30,7 @@ export const verifYToken = async (req, res) => {
   try {
     console.log(req.cookies)
     const { token } = req.cookies;
-    if (!token) return res.status(401).json(['No hay token']);
+    if (!token) return res.status(401).json(['No hay token', req.cookies]);
     jwt.verify(token, TokenSecret, async (err, user) => {
       if (err) return res.status(401).json(['token venido']);
       try {
