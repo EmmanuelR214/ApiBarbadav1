@@ -38,9 +38,9 @@ export const verifYToken = async (req, res) => {
         const [dataUser] = userFound;
         res.status(200).json([req.cookies, userFound, dataUser, dataUser[0].id_usuario])
         return res.json({
-          id: dataUser.id_usuario,
-          rol: dataUser.roles,
-          email: dataUser.correo
+          id: dataUser[0].id_usuario,
+          rol: dataUser[0].roles,
+          email: dataUser[0].correo
         });
       } catch (dbError) {
         console.log(dbError);
