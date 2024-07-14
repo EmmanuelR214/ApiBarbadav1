@@ -48,7 +48,7 @@ export const verifYToken = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).json(['Server Error']);
+    return res.status(500).json(['error al verificar token']);
   }
 };
 // export const verifYToken = async (req, res) => {
