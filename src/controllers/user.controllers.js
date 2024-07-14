@@ -28,15 +28,15 @@ const compareData = async (data, hash) => {
 
 export const verifYToken = async (req, res) => {
   try {
-    console.log(req.cookies)
     const { token } = req.cookies;
-    if (!token) return res.status(401).json(['No hay token', req.cookies]);
+    if (!token) return res.status(401).json(['No hay token']);
     jwt.verify(token, TokenSecret, async (err, user) => {
       if (err) return res.status(401).json(['token venido']);
       try {
         const [userFound] = await Coonexion.query('CALL obtenerUsuarioID(?)', [user.id]);
         if (!userFound || !userFound[0]) return res.status(401).json(['No en la base de datos']);
         const [dataUser] = userFound;
+        res.status(200).json([req.cookies, userFound])
         return res.json({
           id: dataUser.id_usuario,
           rol: dataUser.roles,
