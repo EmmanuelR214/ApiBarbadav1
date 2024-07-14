@@ -28,6 +28,7 @@ const compareData = async (data, hash) => {
 
 export const verifYToken = async (req, res) => {
   try {
+    console.log(req.cookies)
     const { token } = req.cookies;
     if (!token) return res.status(401).json(['No hay token']);
     jwt.verify(token, TokenSecret, async (err, user) => {
