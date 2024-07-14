@@ -8,7 +8,7 @@ const app = express()
 const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'https://amdin.labarbada.store ', 'https://labarbada.store/']
 
 app.use(cors({
-    origin: "https://labarbada.store/",
+    origin: "https://labarbada.store",
     credentials: true
 }));
 app.use(express.json())
