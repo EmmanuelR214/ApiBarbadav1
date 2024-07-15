@@ -214,7 +214,7 @@ export const SearchNumberPhoneRegister = async(req, res) =>{
 //Alerta 
 export const AlertUser = async(req, res) =>{
   try {
-      const {alertUser} = req.cookies
+      const alertUser = req.query.alert
       const clientIp = requestIp.getClientIp(req)
       const locationData = await getLocationFromIP(clientIp)
       const currentDate = new Date()
@@ -239,7 +239,7 @@ export const AlertUser = async(req, res) =>{
       
       let mensaje = `usuario ${result[0].correo} ha intentado iniciar sésion repetitivamente, la IP ${clientIp} se encuentra en la ubicación ${locationData.loc}`
       console.log(result[0].id_usuario) 
-      await Coonexion.execute('CALL RegistroBitacoraUsuario(?,?,?)', [result[0].id_usuario, clientIp, mensaje ])
+      await Coonexion.execute('CALL RegistroBitacoraUsuario(?,?,?)', [result[0].id_usuario, mensaje, clientIp ])
       res.status(200).json(['Informe'])
   } catch (error) {
       console.log(error)
