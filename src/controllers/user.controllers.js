@@ -59,19 +59,17 @@ export const RecoverPasswordEmail = async(req, res) => {
       const {email, password, id} = req.body
       const ip = req.ip
       const pass = await hashData(password)
-      console.log('chi')
       const [update] = await Coonexion.execute('CALL ActualizarPassword(?,?,?,?)',[pass, email, id, ip])
       
       if(update.affectedRows <= 0) return res.status(400).json(['No se pudo actualizar la contraseña'])
       
       const [[result]] = await Coonexion.execute('CALL ObtenerUsuarioCorreo(?)', [email])
-      
-      if(result.length > 0){
-          const token = await CreateAccessToken({id: result[0].id_usuario})
-          res.cookie('token', token)
-          res.status(200).json([result[0]])
-      }else{
-          res.status(200).json(['si'])
+      console.log(result)
+      if (result) {
+        const token = await CreateAccessToken({ id: result[0].id_usuario });
+        res.status(200).json([result, token]);
+      } else {
+        res.status(200).json(['No se encontró el usuario']);
       }
   } catch (error) {
       console.log(error)
@@ -105,18 +103,19 @@ export const sendEmail = async(req, res) =>{
 //Login de facebook y google
 export const RegisterFirebase = async (req, res) =>{
   try {   
-      const {uid, correo, telefono, message } =  req.body
+      const {correo, message, telefono, uid} =  req.body
       const ip = req.ip
       const tel = telefono ? telefono : ''
       const rol = 1
       const estado = 1
+      console.log(correo, message, uid, tel)
       const [[result]] = await Coonexion.execute('CALL ObtenerUsuarioID(?)',[uid])
+      console.log(result)
       if(result.length > 0){
           let mensaje = `El usuario ${correo} inicio sésion con ${message}`
-          await Coonexion.execute('RegistroBitacoraUsuario(?,?,?)', [uid, ip, mensaje ])
+          await Coonexion.execute('CALL RegistroBitacoraUsuario(?,?,?)', [uid, ip, mensaje ])
           const token = await CreateAccessToken({id: uid})
-          res.cookie('token', token)
-          res.status(200).json([result[0], 'login'])
+          res.status(200).json([result[0], 'login', token])
           return
       }else{
           
@@ -128,8 +127,7 @@ export const RegisterFirebase = async (req, res) =>{
           await Coonexion.execute('CALL RegistroUsuario(?,?,?,?,?,?,?,?)',[uid, correo, tel, pass, estado, rol, ip, mensaje])
           const [[lookUser]] = await Coonexion.execute('CALL ObtenerUsuarioID(?)', [uid])
           const token = await CreateAccessToken({id: uid})
-          res.cookie('token', token)
-          res.status(200).json([lookUser, 'register'])
+          res.status(200).json([lookUser, 'register', token])
       }
   } catch (error) {
       console.error('Error al buscar usuario en la base de datos', error)
@@ -189,9 +187,9 @@ export const RegisterUser = async(req, res) =>{
       const [[[dataUser]]] = await Coonexion.execute('CALL obtenerUsuarioID(?)',[newId])
       
       const token = await CreateAccessToken({ id: newId })
-      res.cookie('token', token)
       res.json({
-          dataUser
+          dataUser,
+          token
       })
   } catch (error) {
       res.status(500).json(['Error al crear usuario'])
@@ -231,7 +229,6 @@ export const AlertUser = async(req, res) =>{
       const formattedDate = formatter.format(currentDate)
       
       const [[result]] = await Coonexion.execute('CALL LoginCliente(?)', [alertUser])
-
       console.log(result[0].correo, locationData, formattedDate, clientIp)
       if (result && result[0] && result[0].correo) {
         await AlertMail(result[0].correo, `${locationData.city} ${locationData.region}`, formattedDate, clientIp);
@@ -239,7 +236,7 @@ export const AlertUser = async(req, res) =>{
       
       let mensaje = `usuario ${result[0].correo} ha intentado iniciar sésion repetitivamente, la IP ${clientIp} se encuentra en la ubicación ${locationData.loc}`
       console.log(result[0].id_usuario) 
-      await Coonexion.execute('CALL RegistroBitacoraUsuario(?,?,?)', [result[0].id_usuario, mensaje, clientIp ])
+      await Coonexion.execute('CALL RegistroBitacoraUsuario(?,?,?)', [result[0].id_usuario, clientIp, mensaje ])
       res.status(200).json(['Informe'])
   } catch (error) {
       console.log(error)
