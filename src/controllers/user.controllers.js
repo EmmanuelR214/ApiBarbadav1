@@ -31,7 +31,7 @@ export const verifYToken = async (req, res) => {
     const token = req.query.token
     if (!token) return res.status(401).json(['No hay token'])
     jwt.verify(token, TokenSecret, async (err, user) => {
-      if (err) return res.status(401).json(['token venido'])
+      if (err) return res.status(401).json(['token vencido'])
       try {
         const [userFound] = await Coonexion.query('CALL obtenerUsuarioID(?)', [user.id])
         if (!userFound || !userFound[0]) return res.status(401).json(['No en la base de datos'])
@@ -241,5 +241,28 @@ export const AlertUser = async(req, res) =>{
   } catch (error) {
       console.log(error)
       res.status(500).json(['Error al informar'])
+  }
+}
+
+export const TraerDireccionUser = async(req, res) =>{
+  try {
+      const id = req.params.idUser
+      const [[result]] = await Coonexion.execute('CALL ObtenerDirecciones(?)', [id])
+      const [result2] = await Coonexion.execute('SELECT ad.id_apodo, ad.apodo_direccion, i.url_icono FROM apodos_direcciones ad INNER JOIN iconos i ON ad.id_icono = i.id_icono')
+      res.status(200).json([result, result2])
+  } catch (error) {
+      console.log(error)
+      res.status(500).json(['Error al traer direcciones'])
+  }
+}
+
+export const InsertarDireccion = async(req, res) => {
+  try {
+      const {direccion, descripcion, id_usuario, id_apodo } = req.body
+      await Coonexion.execute('CALL InsertarDireccion(?, ?, ?, ?)', [direccion, descripcion, id_usuario, id_apodo])
+      res.status(200).json(['Dirección agregada'])
+  } catch (error) {
+      console.log(error)
+      res.status(500).json(['Error al insertar la dirección'])
   }
 }
