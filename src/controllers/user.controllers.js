@@ -145,7 +145,7 @@ export const LoginUser = async(req, res) => {
       const [[result]] = await Coonexion.execute('CALL LoginCliente(?)',[param])
       console.log(result)
       if(!result[0]) return res.status(400).json(['El usuario no existe'])
-      if(result[0].id_estado === 'eliminada') return res.status(400).json(['El usuario no existe'])
+      if(result[0].estado_cuenta === 'eliminada') return res.status(400).json(['El usuario no existe'])
       
       const user = result[0]
       const PasswordValid = await compareData(password, user.passwordUs)
