@@ -39,7 +39,8 @@ export const verifYToken = async (req, res) => {
         return res.json({
           id: dataUser[0].id_usuario,
           rol: dataUser[0].roles,
-          email: dataUser[0].correo
+          email: dataUser[0].correo,
+          telefono: dataUser[0].telefono
         })
       } catch (dbError) {
         console.log(dbError)
@@ -144,7 +145,7 @@ export const LoginUser = async(req, res) => {
       const [[result]] = await Coonexion.execute('CALL LoginCliente(?)',[param])
       
       if(!result[0]) return res.status(400).json(['El usuario no existe'])
-      
+      if(result[0].id_estado === 2) return res.status(400).json(['El usuario no existe'])
       const user = result[0]
       const PasswordValid = await compareData(password, user.passwordUs)
       
