@@ -22,9 +22,11 @@ export const ActualizarDatosUsuario = async(req, res) =>{
 export const EliminarCuenta = async(req, res) =>{
   try {
     const {id} = req.params
+    console.log(id)
     await Coonexion.execute('UPDATE usuarios SET id_estado = 2 WHERE id_usuario = ?', [id])
     res.status(200).json(['Cuenta eliminada'])
   } catch (error) {
+    console.log(error)
     res.status(500).json(['Error al eliminar la cuenta'])
   }
 }

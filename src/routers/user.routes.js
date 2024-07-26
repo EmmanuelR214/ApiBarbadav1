@@ -31,6 +31,6 @@ router.get('/publicidad', TraerPublicidad)
 
 router.post('/actualizar-datos-usuario', ActualizarDatosUsuario)
 
-router.get('delete-user/:id', EliminarCuenta)
+router.get('/delete-user/:id', EliminarCuenta)
 
 export default router
