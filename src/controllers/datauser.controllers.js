@@ -9,6 +9,29 @@ export const TraerPublicidad = async(req, res) =>{
   }
 }
 
+export const userProfile = async(req, res) =>{
+  try {
+    const {id} = req.params
+    const [result] = await Coonexion.execute('CALL ObtenerDireccionesYVentas(?)', [id])
+    const direcciones = result[0];
+    const ventas = result[1];
+    console.log(direcciones, ventas)
+    res.status(200).json([direcciones, ventas])
+  } catch (error) {
+    res.status(500).json(['Error al traer datos del usuario'])
+  }
+}
+
+export const EliminarDireccion = async(req, res) => {
+  try {
+    const {id} = req.params
+    await Coonexion.execute('DELETE FROM direcciones WHERE id_direccion = ?', [id])
+    res.status(200).json(['Dirección eliminada'])
+  } catch (error) {
+    res.status(500).json(['Error al eliminar la dirección'])
+  }
+}
+
 export const ActualizarDatosUsuario = async(req, res) =>{
   try {
     const { id_usuario, correo, telefono } = req.body;

@@ -9,6 +9,22 @@ import bcrypt from 'bcrypt'
 
 const TokenSecret = process.env.TOKEN_SECRET
 
+const executeQueryWithRetries = async (query, params, retries = 3) => {
+  while (retries > 0) {
+    try {
+      const [result] = await Coonexion.query(query, params);
+      return result;
+    } catch (error) {
+      if (error.code === 'ECONNRESET' && retries > 0) {
+        retries -= 1;
+        console.log(`Retrying query... (${retries} retries left)`);
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw new Error('Max retries reached');
+}
 
 const hashData = async (data) => {
   try {
@@ -28,30 +44,39 @@ const compareData = async (data, hash) => {
 
 export const verifYToken = async (req, res) => {
   try {
-    const token = req.query.token
-    if (!token) return res.status(401).json(['No hay token'])
+    const token = req.query.token;
+    if (!token) {
+      return res.status(401).json({ error: 'No hay token' });
+    }
+
     jwt.verify(token, TokenSecret, async (err, user) => {
-      if (err) return res.status(401).json(['token vencido'])
+      if (err) {
+        return res.status(401).json({ error: 'Token vencido' });
+      }
+
       try {
-        const [userFound] = await Coonexion.query('CALL obtenerUsuarioID(?)', [user.id])
-        if (!userFound || !userFound[0]) return res.status(401).json(['No en la base de datos'])
-        const [dataUser] = userFound
+        const userFound = await executeQueryWithRetries('CALL obtenerUsuarioID(?)', [user.id]);
+        if (!userFound || !userFound[0]) {
+          return res.status(401).json({ error: 'No en la base de datos' });
+        }
+
+        const [dataUser] = userFound;
         return res.json({
           id: dataUser[0].id_usuario,
           rol: dataUser[0].roles,
           email: dataUser[0].correo,
           telefono: dataUser[0].telefono
-        })
+        });
       } catch (dbError) {
-        console.log(dbError)
-        return res.status(500).json(['Database Error'])
+        console.error('Database Error:', dbError);
+        return res.status(500).json({ error: 'Database Error' });
       }
-    })
+    });
   } catch (error) {
-    console.log(error)
-    return res.status(500).json(['error al verificar token'])
+    console.error('Error al verificar token:', error);
+    return res.status(500).json({ error: 'Error al verificar token' });
   }
-}
+};
 
 
 //Actualiza contraseña por correo
@@ -152,9 +177,7 @@ export const LoginUser = async(req, res) => {
       
       if (!PasswordValid) return res.status(400).json( ["Contraseña incorrecta"] )
       
-      const [[bitacora]] = await Coonexion.execute('CALL ObtenerBitacoraUsuario(?)',[user.id_usuario])
-      
-      const mensaje = ip === bitacora[0].direccion_ip ? `El usuario ${user.correo} inició sesión desde la misma plataforma` : `El usuario ${user.correo} inició sesión desde otro dispositivo`;
+      const mensaje = ip === ip ? `El usuario ${user.correo} inició sesión desde la misma plataforma` : `El usuario ${user.correo} inició sesión desde otro dispositivo`;
       
       await Coonexion.execute('CALL RegistroBitacoraUsuario(?,?,?)', [user.id_usuario, ip, mensaje ])
       
@@ -260,8 +283,8 @@ export const TraerDireccionUser = async(req, res) =>{
 
 export const InsertarDireccion = async(req, res) => {
   try {
-      const {direccion, descripcion, id_usuario, id_apodo } = req.body
-      await Coonexion.execute('CALL InsertarDireccion(?, ?, ?, ?)', [direccion, descripcion, id_usuario, id_apodo])
+      const {direccion, descripcion, id_usuario, id_apodo, lat, lng } = req.body
+      await Coonexion.execute('CALL InsertarDireccion(?, ?, ?, ?, ?, ?)', [direccion, descripcion, id_usuario, id_apodo, lat, lng])
       res.status(200).json(['Dirección agregada'])
   } catch (error) {
       console.log(error)

@@ -2,7 +2,7 @@ import {Router} from 'express'
 import {validateSchema} from '../middlewares/validator.middleware.js'
 import { LoginSchema, RegisterSchema, SendMail, SearchPhoneSchema, RecoverPasswordSchema } from '../schemas/auth.schema.js'
 import { AlertUser, InsertarDireccion, LoginUser, RecoverPasswordEmail, RegisterFirebase, RegisterUser, SearchNumberPhoneRegister, sendEmail, TraerDireccionUser, verifYToken } from '../controllers/user.controllers.js'
-import {  ActualizarDatosUsuario, EliminarCuenta, TraerPublicidad } from '../controllers/datauser.controllers.js'
+import {  ActualizarDatosUsuario, EliminarCuenta, EliminarDireccion, TraerPublicidad, userProfile } from '../controllers/datauser.controllers.js'
 
 const router = Router()
 
@@ -29,8 +29,12 @@ router.post('/insertarDireccion', InsertarDireccion)
 
 router.get('/publicidad', TraerPublicidad)
 
+router.get('/data-user/:id', userProfile)
+
 router.post('/actualizar-datos-usuario', ActualizarDatosUsuario)
 
 router.get('/delete-user/:id', EliminarCuenta)
+
+router.delete('/eliminar-direccion/:id', EliminarDireccion)
 
 export default router
