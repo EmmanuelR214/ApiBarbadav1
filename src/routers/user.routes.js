@@ -35,6 +35,6 @@ router.post('/actualizar-datos-usuario', ActualizarDatosUsuario)
 
 router.get('/delete-user/:id', EliminarCuenta)
 
-router.delete('/eliminar-direccion/:id', EliminarDireccion)
+router.get('/eliminar-direccion/:id', EliminarDireccion)
 
 export default router

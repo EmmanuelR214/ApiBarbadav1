@@ -25,9 +25,10 @@ export const userProfile = async(req, res) =>{
 export const EliminarDireccion = async(req, res) => {
   try {
     const {id} = req.params
-    await Coonexion.execute('DELETE FROM direcciones WHERE id_direccion = ?', [id])
+    await Coonexion.execute('UPDATE direcciones SET disponible = FALSE WHERE id_direccion = ?', [id]);
     res.status(200).json(['Dirección eliminada'])
   } catch (error) {
+    console.log(error)
     res.status(500).json(['Error al eliminar la dirección'])
   }
 }
