@@ -53,19 +53,23 @@ export const verifYToken = async (req, res) => {
       if (err) {
         return res.status(401).json({ error: 'Token vencido' });
       }
-
       try {
         const userFound = await executeQueryWithRetries('CALL obtenerUsuarioID(?)', [user.id]);
+        
         if (!userFound || !userFound[0]) {
           return res.status(401).json({ error: 'No en la base de datos' });
         }
-
+        
+        const [[countCar]] = await executeQueryWithRetries('CALL ObtenerCantidadProductosCarrito(?)', [userFound[0][0].id_usuario]);
+        
+        
         const [dataUser] = userFound;
         return res.json({
           id: dataUser[0].id_usuario,
           rol: dataUser[0].roles,
           email: dataUser[0].correo,
-          telefono: dataUser[0].telefono
+          telefono: dataUser[0].telefono,
+          carrito: countCar.cantidad_productos,
         });
       } catch (dbError) {
         console.error('Database Error:', dbError);
