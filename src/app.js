@@ -4,11 +4,17 @@ import cookieParser from 'cookie-parser';
 import indexRoutes from './routers/user.routes.js'
 
 const app = express()
-const allowedOrigins = ['http://localhost:5173', 'https://labarbada.store', 'https://app.labarbada.com']
+const allowedOrigins = ['http://localhost:5173', 'https://labarbada.store', 'https://app.labarbada.com/', 'null'];
 app.use(cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true  
-}))
+}));
 
 app.use(express.json())
 app.use(cookieParser())
