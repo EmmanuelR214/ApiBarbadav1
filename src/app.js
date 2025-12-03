@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import indexRoutes from './routers/user.routes.js'
 
 const app = express()
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:4173', 'https://labarbada.store', 'https://app.labarbada.com/', 'null'];
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:4173', 'https://labarbada.store', 'https://app.labarbada.com/', 'https://la-barbada2.vercel.app/', 'null'];
 app.use(cors({
     origin: function (origin, callback) {
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
